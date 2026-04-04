@@ -32,6 +32,8 @@ struct Shader {
 struct Program {
     GLuint id = 0;
 
+    Program() = default;
+
     Program(const std::string& vs_source, const std::string& fs_source) {
         Shader vs(vs_source, GL_VERTEX_SHADER);
         Shader fs(fs_source, GL_FRAGMENT_SHADER);
@@ -62,6 +64,4 @@ struct Program {
     void destroy() {
         if (id) glDeleteProgram(id);
     }
-
-    Program() {};
 };
