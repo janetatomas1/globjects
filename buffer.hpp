@@ -30,10 +30,8 @@ struct Buffer {
 
     void upload(size_t idx,
                 const std::vector<float>& data,
-                GLint componentCount)
-    {
-        bindBuffer(idx);
-
+                GLint componentCount) {
+        bind_buffer(idx);
         glBufferData(GL_ARRAY_BUFFER,
                      data.size() * sizeof(float),
                      data.data(),
