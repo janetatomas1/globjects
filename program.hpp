@@ -60,7 +60,9 @@ struct Program {
         return glGetUniformLocation(id, name);
     }
 
-    ~Program() {}
+    ~Program() {
+        if (id) glDeleteProgram(id);
+    }
     void destroy() {
         if (id) glDeleteProgram(id);
     }
