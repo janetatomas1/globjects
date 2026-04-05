@@ -27,3 +27,7 @@ std::string get_opengl_error() {
             return "Unknown OpenGL error";
     }
 }
+
+void viewport(int x, int y, int width, int height) {
+    glViewport(x, y, width, height);
+}

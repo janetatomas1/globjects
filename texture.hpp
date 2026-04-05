@@ -1,5 +1,6 @@
 
 #include <GL/gl.h>
+#include <vector>
 
 struct Texture {
     GLuint id;
@@ -35,6 +36,21 @@ struct Texture {
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, id, 0);
+    }
+
+    void export_data(std::vector<unsigned char> &pixels) {
+        bind();
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+
+        for (int y = 0; y < height / 2; ++y) {
+            for (int x = 0; x < width * 4; ++x) {
+                std::swap(
+                    pixels[y * width * 4 + x],
+                    pixels[(height - 1 - y) * width * 4 + x]
+                );
+            }
+        }
+
     }
 
     void destroy() {
