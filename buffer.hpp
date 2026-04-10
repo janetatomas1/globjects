@@ -28,14 +28,35 @@ struct Buffer {
         glBindBuffer(GL_ARRAY_BUFFER, VBOs[idx]);
     }
 
-    void upload(size_t idx,
-                const std::vector<float>& data,
-                GLint componentCount) {
+    void upload(
+        size_t idx,
+        const std::vector<float>& data,
+        GLint componentCount
+    ) {
         bind_buffer(idx);
-        glBufferData(GL_ARRAY_BUFFER,
-                     data.size() * sizeof(float),
-                     data.data(),
-                     GL_STATIC_DRAW);
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            data.size() * sizeof(float),
+            data.data(),
+            GL_STATIC_DRAW
+        );
+
+        layout(idx, componentCount);
+    }
+
+    void upload(
+        size_t idx,
+        float *data,
+        size_t size,
+        GLint componentCount
+    ) {
+        bind_buffer(idx);
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            size * sizeof(float),
+            data,
+            GL_STATIC_DRAW
+        );
 
         layout(idx, componentCount);
     }

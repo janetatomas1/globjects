@@ -31,6 +31,15 @@ struct ElementBuffer {
         buffer.upload(idx, data, componentCount);
     }
 
+    void upload(
+        size_t idx,
+        float* data,
+        size_t size,
+        GLint componentCount
+    ) {
+        buffer.upload(idx, data, size, componentCount);
+    }
+
     void upload_indices(const std::vector<unsigned int>& indices) {
         buffer.bind();
 

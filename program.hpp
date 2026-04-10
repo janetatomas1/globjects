@@ -5,6 +5,7 @@
 #include <GL/glew.h>
 #include <string>
 #include <stdexcept>
+#include <iostream>
 
 struct Shader {
     GLuint id = 0;
@@ -20,6 +21,7 @@ struct Shader {
         if (!success) {
             char log[512];
             glGetShaderInfoLog(id, 512, nullptr, log);
+            std::cout << log << std::endl;
             throw std::runtime_error(std::string("Shader compile error: ") + log);
         }
     }
