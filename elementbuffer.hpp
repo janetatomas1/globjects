@@ -54,11 +54,6 @@ struct ElementBuffer {
         indexCount = static_cast<GLsizei>(indices.size());
     }
 
-    void draw(GLenum mode = GL_TRIANGLES) {
-        buffer.bind();
-        glDrawElements(mode, indexCount, GL_UNSIGNED_INT, 0);
-    }
-
     void destroy() {
         buffer.destroy();
         glDeleteBuffers(1, &EBO);
