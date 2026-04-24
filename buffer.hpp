@@ -1,17 +1,42 @@
 #pragma once
 
-#include <GL/glew.h>
+#include <GL/gl.h>
 #include <vector>
 
 struct Buffer {
-    GLuint VAO;
+    GLuint VAO = 0;
     std::vector<GLuint> VBOs;
 
     Buffer(size_t numAttributes) {
         glGenVertexArrays(1, &VAO);
-
         VBOs.resize(numAttributes);
         glGenBuffers(static_cast<GLsizei>(numAttributes), VBOs.data());
+    }
+
+    ~Buffer() {
+        destroy();
+    }
+
+    Buffer(const Buffer&) = delete;
+    Buffer& operator=(const Buffer&) = delete;
+
+    Buffer(Buffer&& other) noexcept
+        : VAO(other.VAO), VBOs(std::move(other.VBOs)) {
+        other.VAO = 0;
+        other.VBOs.clear();
+    }
+
+    Buffer& operator=(Buffer&& other) noexcept {
+        if (this != &other) {
+            destroy();
+
+            VAO = other.VAO;
+            VBOs = std::move(other.VBOs);
+
+            other.VAO = 0;
+            other.VBOs.clear();
+        }
+        return *this;
     }
 
     void bind() {
@@ -74,7 +99,13 @@ struct Buffer {
     }
 
     void destroy() {
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(static_cast<GLsizei>(VBOs.size()), VBOs.data());
+        if (VAO != 0) {
+            glDeleteVertexArrays(1, &VAO);
+            VAO = 0;
+        }
+        if (!VBOs.empty()) {
+            glDeleteBuffers(static_cast<GLsizei>(VBOs.size()), VBOs.data());
+            VBOs.clear();
+        }
     }
 };

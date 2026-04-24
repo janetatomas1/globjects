@@ -1,8 +1,7 @@
 
 #pragma once
 
-#include <GL/glew.h>
-#include <GL/glew.h>
+#include <GL/gl.h>
 #include <string>
 #include <stdexcept>
 #include <iostream>
@@ -10,8 +9,11 @@
 struct Shader {
     GLuint id = 0;
 
+    Shader() = default;
+
     Shader(const std::string& source, GLenum type) {
         id = glCreateShader(type);
+
         const char* src = source.c_str();
         glShaderSource(id, 1, &src, nullptr);
         glCompileShader(id);
@@ -21,13 +23,31 @@ struct Shader {
         if (!success) {
             char log[512];
             glGetShaderInfoLog(id, 512, nullptr, log);
-            std::cout << log << std::endl;
+            glDeleteShader(id);
+            id = 0;
             throw std::runtime_error(std::string("Shader compile error: ") + log);
         }
     }
 
     ~Shader() {
         if (id) glDeleteShader(id);
+    }
+
+    Shader(const Shader&) = delete;
+    Shader& operator=(const Shader&) = delete;
+
+    Shader(Shader&& other) noexcept : id(other.id) {
+        other.id = 0;
+    }
+
+    Shader& operator=(Shader&& other) noexcept {
+        if (this != &other) {
+            if (id) glDeleteShader(id);
+
+            id = other.id;
+            other.id = 0;
+        }
+        return *this;
     }
 };
 
@@ -50,8 +70,36 @@ struct Program {
         if (!success) {
             char log[512];
             glGetProgramInfoLog(id, 512, nullptr, log);
+
+            glDeleteProgram(id);
+            id = 0;
+
             throw std::runtime_error(std::string("Program link error: ") + log);
         }
+
+        glDetachShader(id, vs.id);
+        glDetachShader(id, fs.id);
+    }
+
+    ~Program() {
+        destroy();
+    }
+
+    Program(const Program&) = delete;
+    Program& operator=(const Program&) = delete;
+
+    Program(Program&& other) noexcept : id(other.id) {
+        other.id = 0;
+    }
+
+    Program& operator=(Program&& other) noexcept {
+        if (this != &other) {
+            destroy();
+
+            id = other.id;
+            other.id = 0;
+        }
+        return *this;
     }
 
     void use() const {
@@ -63,6 +111,9 @@ struct Program {
     }
 
     void destroy() {
-        if (id) glDeleteProgram(id);
+        if (id) {
+            glDeleteProgram(id);
+            id = 0;
+        }
     }
 };

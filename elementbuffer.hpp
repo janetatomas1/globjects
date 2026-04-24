@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <vector>
@@ -7,12 +6,41 @@
 
 struct ElementBuffer {
     Buffer buffer;
-    GLuint EBO{};
+    GLuint EBO = 0;
     GLsizei indexCount = 0;
 
     ElementBuffer(size_t numAttributes)
         : buffer(numAttributes) {
         glGenBuffers(1, &EBO);
+    }
+
+    ~ElementBuffer() {
+        destroy();
+    }
+
+    ElementBuffer(const ElementBuffer&) = delete;
+    ElementBuffer& operator=(const ElementBuffer&) = delete;
+
+    ElementBuffer(ElementBuffer&& other) noexcept
+        : buffer(std::move(other.buffer)),
+          EBO(other.EBO),
+          indexCount(other.indexCount) {
+        other.EBO = 0;
+        other.indexCount = 0;
+    }
+
+    ElementBuffer& operator=(ElementBuffer&& other) noexcept {
+        if (this != &other) {
+            destroy();
+
+            buffer = std::move(other.buffer);
+            EBO = other.EBO;
+            indexCount = other.indexCount;
+
+            other.EBO = 0;
+            other.indexCount = 0;
+        }
+        return *this;
     }
 
     void bind() {
@@ -56,6 +84,9 @@ struct ElementBuffer {
 
     void destroy() {
         buffer.destroy();
-        glDeleteBuffers(1, &EBO);
+        if (EBO != 0) {
+            glDeleteBuffers(1, &EBO);
+            EBO = 0;
+        }
     }
 };
